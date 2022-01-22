@@ -1,0 +1,10 @@
+def gradleScriptRoot = "$rootDir/gradle"
+apply from: "$gradleScriptRoot/common_library.gradle"
+apply from: "$gradleScriptRoot/dependencies.gradle"
+
+dependencies {
+    implementation kotlin
+    implementation javaxInject
+
+    implementation coroutinesCore
+}
