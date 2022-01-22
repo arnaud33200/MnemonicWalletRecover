@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 def gradleScriptRoot = "$rootDir/gradle"
@@ -62,6 +64,9 @@ dependencies {
     implementation composeMaterial
     implementation ComposeActivity
     implementation ComposePreview
+
+    implementation hiltAndroid
+    kapt hiltKapt
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

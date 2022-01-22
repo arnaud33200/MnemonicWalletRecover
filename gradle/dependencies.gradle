@@ -6,6 +6,8 @@ ext {
     composeVersion = '1.0.5'
     composeActivityVersion = '1.4.0'
 
+    hiltVersion = '2.38.1'
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     domainModule = project(":domain")
@@ -23,4 +25,8 @@ ext {
     composeMaterial = "androidx.compose.material:material:$composeVersion"
     ComposePreview = "androidx.compose.ui:ui-tooling-preview:$composeVersion"
     ComposeActivity = "androidx.activity:activity-compose:$composeActivityVersion"
+
+    // Hilt
+    hiltAndroid =  "com.google.dagger:hilt-android:$hiltVersion"
+    hiltKapt = "com.google.dagger:hilt-compiler:$hiltVersion"
 }
