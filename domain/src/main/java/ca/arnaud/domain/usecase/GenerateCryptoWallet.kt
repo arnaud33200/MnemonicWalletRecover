@@ -1,6 +1,7 @@
 package ca.arnaud.domain.usecase
 
 import ca.arnaud.domain.executor.JobExecutorProvider
+import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.Wallet
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.crypto.DeterministicKey
@@ -13,14 +14,9 @@ import javax.inject.Inject
 
 class GenerateCryptoWallet @Inject constructor(
     jobExecutorProvider: JobExecutorProvider
-) : SuspendableUseCase<GenerateCryptoWallet.Params, Wallet>(jobExecutorProvider) {
+) : SuspendableUseCase<CreateWalletParams, Wallet>(jobExecutorProvider) {
 
-    data class Params(
-        val words: String,
-        val password: String = ""
-    )
-
-    override suspend fun buildRequest(params: Params): Wallet {
+    override suspend fun buildRequest(params: CreateWalletParams): Wallet {
         val seed = DeterministicSeed(params.words, null, params.password, 1409478661L)
         val chain = DeterministicKeyChain.builder().seed(seed).build()
         val keyPath: List<ChildNumber> = HDUtils.parsePath("M/44H/60H/0H/0/0")
