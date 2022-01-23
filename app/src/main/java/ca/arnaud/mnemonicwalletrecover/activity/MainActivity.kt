@@ -44,15 +44,30 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
                     val screenModel = viewModel.screenModel.collectAsState().value
                     val walletWordsModel = viewModel.walletWordsModel.collectAsState().value
-                    MainScreen(screenModel, walletWordsModel)
+                    val result = viewModel.result.collectAsState().value
+
+                    MainScreen(screenModel, walletWordsModel, result, object : MainScreenActionCallback {
+                        override fun recoverWalletButtonClick() {
+                            viewModel.recoverWalletButtonClick()
+                        }
+                    })
                 }
             }
         }
     }
 }
 
+interface MainScreenActionCallback {
+    fun recoverWalletButtonClick()
+}
+
 @Composable
-fun MainScreen(model: MainScreenModel, walletWordsModel: WalletWordsModel) {
+fun MainScreen(
+    model: MainScreenModel,
+    walletWordsModel: WalletWordsModel,
+    result: String,
+    callback: MainScreenActionCallback
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -80,11 +95,12 @@ fun MainScreen(model: MainScreenModel, walletWordsModel: WalletWordsModel) {
             }
         }
 
+        // TODO - put a loader inside
         Button(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .height(50.dp),
-            onClick = { }
+            onClick = { callback.recoverWalletButtonClick() }
         ) {
             Text(
                 text = "Get Private Key",
@@ -93,6 +109,13 @@ fun MainScreen(model: MainScreenModel, walletWordsModel: WalletWordsModel) {
                 color = MnemonicWalletRecoverTheme.colors.labelOnPrimary
             )
         }
+
+        Text(
+            modifier = Modifier.padding(30.dp),
+            text = result,
+            style = MnemonicWalletRecoverTheme.typography.body1,
+            color = MnemonicWalletRecoverTheme.colors.primaryLabel.copy(alpha = 0.8F)
+        )
     }
 }
 
@@ -131,7 +154,14 @@ fun DefaultPreview() {
                 List(12) { "Word ${it + 1}" }.map { value ->
                     TextFieldModel(value) { }
                 }
-            )
+            ),
+            "0x32oi12n3o21in31o2i3n12",
+            object : MainScreenActionCallback {
+                override fun recoverWalletButtonClick() {
+
+                }
+
+            }
         )
     }
 }
