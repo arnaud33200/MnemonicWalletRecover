@@ -66,6 +66,8 @@ dependencies {
     implementation ComposePreview
 
     implementation hiltAndroid
+    implementation hiltViewModel
+    kapt androidxHiltKapt
     kapt hiltKapt
 
     testImplementation 'junit:junit:4.+'

@@ -7,6 +7,7 @@ ext {
     composeActivityVersion = '1.4.0'
 
     hiltVersion = '2.38.1'
+    hiltViewModelVersion = '1.0.0-alpha03'
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -29,4 +30,6 @@ ext {
     // Hilt
     hiltAndroid =  "com.google.dagger:hilt-android:$hiltVersion"
     hiltKapt = "com.google.dagger:hilt-compiler:$hiltVersion"
+    hiltViewModel = "androidx.hilt:hilt-lifecycle-viewmodel:$hiltViewModelVersion"
+    androidxHiltKapt = "androidx.hilt:hilt-compiler:$hiltViewModelVersion"
 }
