@@ -50,6 +50,10 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    packagingOptions {
+        exclude 'lib/x86_64/darwin/libscrypt.dylib'
+    }
 }
 
 dependencies {
@@ -69,6 +73,8 @@ dependencies {
     implementation hiltViewModel
     kapt androidxHiltKapt
     kapt hiltKapt
+
+    implementation 'com.google.guava:guava:27.0.1-android'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
