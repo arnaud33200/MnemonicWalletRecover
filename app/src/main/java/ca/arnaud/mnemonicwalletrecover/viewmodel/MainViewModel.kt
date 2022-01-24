@@ -83,9 +83,11 @@ class MainViewModel @Inject constructor(
             titleRes = R.string.generating_wallet_button,
             isLoading = true
         )
+        _walletWordsModel.value = walletWordsModelFactory.createDisabled(words)
     }
 
     private fun hideLoader() {
         _button.value = getDefaultButton()
+        _walletWordsModel.value = generateWalletWordsModel()
     }
 }

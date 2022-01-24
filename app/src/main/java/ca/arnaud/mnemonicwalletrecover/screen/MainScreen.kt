@@ -9,6 +9,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,6 +86,7 @@ fun MainScreen(
 fun WordTextField(modifier: Modifier, wordField: TextFieldModel) {
     TextField(
         modifier = modifier
+            .alpha(if (wordField.enabled) 1f else 0.3f)
             .padding(horizontal = 5.dp)
             .border(
                 1.dp,
@@ -96,6 +98,7 @@ fun WordTextField(modifier: Modifier, wordField: TextFieldModel) {
             color = MnemonicWalletRecoverTheme.colors.primaryLabel
         ),
         singleLine = true,
+        enabled = wordField.enabled,
         value = wordField.value,
         onValueChange = wordField.changeCallback,
         colors = TextFieldDefaults.textFieldColors(
@@ -114,7 +117,7 @@ fun DefaultPreview() {
             ),
             WalletWordsModel(
                 List(12) { "Word ${it + 1}" }.map { value ->
-                    TextFieldModel(value) { }
+                    TextFieldModel(value, true) { }
                 }
             ),
             LoadingButtonModel("Generate Wallet", false),
