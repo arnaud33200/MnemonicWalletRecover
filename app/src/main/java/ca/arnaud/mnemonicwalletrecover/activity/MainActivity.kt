@@ -28,15 +28,13 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
                     val screenModel = viewModel.screenModel.collectAsState().value
                     val walletWordsModel = viewModel.walletWordsModel.collectAsState().value
-                    val result = viewModel.result.collectAsState().value
                     val button = viewModel.button.collectAsState().value
+                    val dialog = viewModel.dialog.collectAsState().value
 
-                    MainScreen(screenModel, walletWordsModel, button, result,
-                        object : MainScreenActionCallback {
-                            override fun recoverWalletButtonClick() {
-                                viewModel.recoverWalletButtonClick()
-                            }
-                        })
+                    MainScreen(
+                        screenModel, walletWordsModel,
+                        button, dialog, viewModel
+                    )
                 }
             }
         }

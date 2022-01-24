@@ -24,8 +24,8 @@ fun MnemonicWalletRecoverAppTheme(
     }
 }
 
-val localAppColors = staticCompositionLocalOf { AppColors() }
-val localAppTypography = staticCompositionLocalOf { AppTypography() }
+val localAppColors = staticCompositionLocalOf { DefaultAppColors }
+val localAppTypography = staticCompositionLocalOf { DefaultAppTypography }
 
 object MnemonicWalletRecoverTheme {
     val colors: AppColors @Composable get() = localAppColors.current

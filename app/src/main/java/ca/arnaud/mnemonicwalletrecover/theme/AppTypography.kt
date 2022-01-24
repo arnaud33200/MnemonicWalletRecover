@@ -11,15 +11,27 @@ import androidx.compose.ui.unit.sp
 
 @Immutable
 data class AppTypography(
-    val h1: TextStyle = TextStyle.Default,
-    val body1: TextStyle = TextStyle.Default,
-    val button1: TextStyle = TextStyle.Default
+    val h1: TextStyle,
+    val h2: TextStyle,
+    val body1: TextStyle,
+    val button1: TextStyle
+)
+
+val DefaultAppTypography = AppTypography(
+    h1 = TextStyle.Default,
+    h2 = TextStyle.Default,
+    body1 = TextStyle.Default,
+    button1 = TextStyle.Default
 )
 
 val MnemonicWalletRecoverTypography: AppTypography
     @Composable get() = AppTypography(
         h1 = createTextStyle(
             fontSize = 36.sp,
+            fontWeight = FontWeight.Bold
+        ),
+        h2 = createTextStyle(
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         ),
         body1 = createTextStyle(

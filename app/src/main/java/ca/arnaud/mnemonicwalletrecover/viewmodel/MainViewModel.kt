@@ -6,11 +6,14 @@ import ca.arnaud.MnemonicWalletRecover.R
 import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
+import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletWordsModelFactory
 import ca.arnaud.mnemonicwalletrecover.mapper.ListToWalletWordsMapper
 import ca.arnaud.mnemonicwalletrecover.model.LoadingButtonModel
 import ca.arnaud.mnemonicwalletrecover.model.MainScreenModel
+import ca.arnaud.mnemonicwalletrecover.model.WalletInfoDialogModel
 import ca.arnaud.mnemonicwalletrecover.model.WalletWordsModel
+import ca.arnaud.mnemonicwalletrecover.screen.MainScreenActionCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,8 +25,9 @@ class MainViewModel @Inject constructor(
     private val generateCryptoWallet: GenerateCryptoWallet,
     private val walletWordsModelFactory: WalletWordsModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
+    private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
     private val listToWalletWordsMapper: ListToWalletWordsMapper
-) : ViewModel() {
+) : ViewModel(), MainScreenActionCallback {
 
     companion object {
         const val DEFAULT_WORDS_COUNT = 12
@@ -40,12 +44,11 @@ class MainViewModel @Inject constructor(
     private val _walletWordsModel = MutableStateFlow(generateWalletWordsModel())
     val walletWordsModel: StateFlow<WalletWordsModel> = _walletWordsModel
 
-    // TODO - replace with wallet
-    private val _result = MutableStateFlow("")
-    val result: StateFlow<String> = _result
-
     private val _button = MutableStateFlow(getDefaultButton())
     val button: StateFlow<LoadingButtonModel> = _button
+
+    private val _dialog = MutableStateFlow<WalletInfoDialogModel?>(null)
+    val dialog: StateFlow<WalletInfoDialogModel?> = _dialog
 
     private fun generateWalletWordsModel(): WalletWordsModel {
         return walletWordsModelFactory.create(words) { text, index ->
@@ -56,20 +59,6 @@ class MainViewModel @Inject constructor(
     private fun updateWalletWord(text: String, index: Int) {
         words[index] = text
         _walletWordsModel.value = generateWalletWordsModel()
-    }
-
-    fun recoverWalletButtonClick() {
-        showLoader()
-        viewModelScope.launch {
-            val wallet = generateCryptoWallet.execute(
-                CreateWalletParams(
-                    words = listToWalletWordsMapper.mapTo(words)
-                )
-            )
-
-            hideLoader()
-            _result.value = wallet.privateKey
-        }
     }
 
     private fun getDefaultButton(): LoadingButtonModel {
@@ -90,4 +79,30 @@ class MainViewModel @Inject constructor(
         _button.value = getDefaultButton()
         _walletWordsModel.value = generateWalletWordsModel()
     }
+
+    // region Click Action
+
+    override fun recoverWalletButtonClick() {
+        showLoader()
+        viewModelScope.launch {
+            val wallet = generateCryptoWallet.execute(
+                CreateWalletParams(
+                    words = listToWalletWordsMapper.mapTo(words)
+                )
+            )
+
+            hideLoader()
+            _dialog.value = walletInfoDialogModelFactory.create(wallet)
+        }
+    }
+
+    override fun dismissWalletInfoDialogClick() {
+        _dialog.value = null
+    }
+
+    override fun copyPrivateKeyClick() {
+        // TODO - use case to copy key
+    }
+
+    // region
 }

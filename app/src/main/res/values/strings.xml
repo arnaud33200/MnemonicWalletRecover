@@ -2,4 +2,8 @@
     <string name="app_name">MnemonicWalletRecover</string>
     <string name="generate_wallet_button">Generate Wallet</string>
     <string name="generating_wallet_button">Generating...</string>
+    <string name="wallet_info_title">Wallet Info</string>
+    <string name="copy_private_key_button">Copy Private Key</string>
+    <string name="public_key_title">Public key</string>
+    <string name="private_key_title">Private key</string>
 </resources>
