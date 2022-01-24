@@ -3,7 +3,6 @@ package ca.arnaud.mnemonicwalletrecover.screen
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -14,13 +13,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ca.arnaud.mnemonicwalletrecover.activity.MainActivity
+import ca.arnaud.mnemonicwalletrecover.model.LoadingButtonModel
 import ca.arnaud.mnemonicwalletrecover.model.MainScreenModel
 import ca.arnaud.mnemonicwalletrecover.model.TextFieldModel
 import ca.arnaud.mnemonicwalletrecover.model.WalletWordsModel
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings.WALLET_WORDS_COLUMNS
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
+import ca.arnaud.mnemonicwalletrecover.view.LoadingButton
 
 interface MainScreenActionCallback {
     fun recoverWalletButtonClick()
@@ -34,6 +34,7 @@ object MainScreenSettings {
 fun MainScreen(
     model: MainScreenModel,
     walletWordsModel: WalletWordsModel,
+    button: LoadingButtonModel,
     result: String,
     callback: MainScreenActionCallback
 ) {
@@ -64,20 +65,12 @@ fun MainScreen(
             }
         }
 
-        // TODO - put a loader inside
-        Button(
+        LoadingButton(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .height(50.dp),
-            onClick = { callback.recoverWalletButtonClick() }
-        ) {
-            Text(
-                text = "Get Private Key",
-                textAlign = TextAlign.Center,
-                style = MnemonicWalletRecoverTheme.typography.button1,
-                color = MnemonicWalletRecoverTheme.colors.labelOnPrimary
-            )
-        }
+            model = button
+        ) { callback.recoverWalletButtonClick() }
 
         Text(
             modifier = Modifier.padding(30.dp),
@@ -124,6 +117,7 @@ fun DefaultPreview() {
                     TextFieldModel(value) { }
                 }
             ),
+            LoadingButtonModel("Generate Wallet", false),
             "0x32oi12n3o21in31o2i3n12",
             object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MnemonicWalletRecover</string>
+    <string name="generate_wallet_button">Generate Wallet</string>
+    <string name="generating_wallet_button">Generating...</string>
 </resources>

@@ -29,8 +29,9 @@ class MainActivity : ComponentActivity() {
                     val screenModel = viewModel.screenModel.collectAsState().value
                     val walletWordsModel = viewModel.walletWordsModel.collectAsState().value
                     val result = viewModel.result.collectAsState().value
+                    val button = viewModel.button.collectAsState().value
 
-                    MainScreen(screenModel, walletWordsModel, result,
+                    MainScreen(screenModel, walletWordsModel, button, result,
                         object : MainScreenActionCallback {
                             override fun recoverWalletButtonClick() {
                                 viewModel.recoverWalletButtonClick()
