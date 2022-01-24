@@ -21,9 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MnemonicWalletRecoverAppTheme(
-                darkTheme = false
-            ) {
+            MnemonicWalletRecoverAppTheme {
 
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
                     val screenModel = viewModel.screenModel.collectAsState().value

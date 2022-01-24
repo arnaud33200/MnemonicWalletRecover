@@ -5,14 +5,25 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +47,7 @@ object MainScreenSettings {
     const val WALLET_WORDS_COLUMNS = 3
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainScreen(
     model: MainScreenModel,
@@ -63,6 +75,9 @@ fun MainScreen(
 
         val columnCount = WALLET_WORDS_COLUMNS
         val rowCount = walletWordsModel.wordFields.size / columnCount
+        val focusRequesters = List(walletWordsModel.wordFields.size) { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
         for (y in 0 until rowCount) {
             Row(
                 modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp)
@@ -70,7 +85,14 @@ fun MainScreen(
                 for (x in 0 until columnCount) {
                     val index = (y * columnCount) + x
                     val wordField = walletWordsModel.wordFields[index]
-                    WordTextField(Modifier.weight(1F), wordField)
+                    WordTextField(
+                        Modifier.weight(1F), wordField,
+                        focusRequesters[index], focusRequesters.getOrNull(index + 1)
+                    ) {
+                        keyboardController?.hide()
+                        callback.recoverWalletButtonClick()
+                    }
+
                 }
             }
         }
@@ -80,7 +102,10 @@ fun MainScreen(
                 .padding(top = 20.dp)
                 .height(50.dp),
             model = button
-        ) { callback.recoverWalletButtonClick() }
+        ) {
+            keyboardController?.hide()
+            callback.recoverWalletButtonClick()
+        }
     }
 
     dialog?.let { dialogModel ->
@@ -155,9 +180,17 @@ private fun WalletInfoDialog(model: WalletInfoDialogModel, callback: MainScreenA
 }
 
 @Composable
-private fun WordTextField(modifier: Modifier, wordField: TextFieldModel) {
+private fun WordTextField(
+    modifier: Modifier,
+    wordField: TextFieldModel,
+    focusRequester: FocusRequester,
+    nextFocusRequester: FocusRequester?,
+    doneClick: () -> Unit
+) {
     TextField(
         modifier = modifier
+            .focusRequester(focusRequester)
+            .focusOrder { nextFocusRequester?.requestFocus() }
             .alpha(if (wordField.enabled) 1f else 0.3f)
             .padding(horizontal = 5.dp)
             .border(
@@ -165,6 +198,12 @@ private fun WordTextField(modifier: Modifier, wordField: TextFieldModel) {
                 MnemonicWalletRecoverTheme.colors.primaryLabel,
                 shape = RoundedCornerShape(8.dp)
             ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { doneClick() }
+        ),
         textStyle = MnemonicWalletRecoverTheme.typography.body1.copy(
             textAlign = TextAlign.Center,
             color = MnemonicWalletRecoverTheme.colors.primaryLabel
