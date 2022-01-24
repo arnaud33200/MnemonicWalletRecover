@@ -16,7 +16,11 @@ import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 
 @Composable
-fun LoadingButton(modifier: Modifier, model: LoadingButtonModel, onClick: () -> Unit) {
+fun LoadingButton(
+    modifier: Modifier,
+    model: LoadingButtonModel,
+    onClick: () -> Unit
+) {
     Button(
         modifier = modifier,
         onClick = onClick,

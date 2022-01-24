@@ -7,7 +7,8 @@ import ca.arnaud.mnemonicwalletrecover.provider.ResourceProvider
 import javax.inject.Inject
 
 class WalletInfoDialogModelFactory @Inject constructor(
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val loadingButtonModelFactory: LoadingButtonModelFactory
 ) {
 
     companion object {
@@ -31,9 +32,11 @@ class WalletInfoDialogModelFactory @Inject constructor(
             title = resourceProvider.getString(R.string.wallet_info_title),
             fullPublicKey = getKeyFormat(wallet.publicKey),
             formattedPrivateKey = getKeyFormat(formattedPrivateKey),
-            copyButton = resourceProvider.getString(R.string.copy_private_key_button),
+            copyButton = loadingButtonModelFactory.create(R.string.copy_private_key_button)
         )
     }
 
-    private fun getKeyFormat(key: String) = "0x$key"
+    private fun getKeyFormat(key: String): String {
+        return if (key.startsWith("0x")) key else "0x$key"
+    }
 }

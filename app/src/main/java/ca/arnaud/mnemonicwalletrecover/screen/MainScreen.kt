@@ -103,7 +103,10 @@ private fun WalletInfoDialog(model: WalletInfoDialogModel, callback: MainScreenA
                 val keyResultModifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 5.dp)
-                    .background(MnemonicWalletRecoverTheme.colors.secondaryBackground, shape = RoundedCornerShape(4.dp))
+                    .background(
+                        MnemonicWalletRecoverTheme.colors.secondaryBackground,
+                        shape = RoundedCornerShape(4.dp)
+                    )
                     .padding(5.dp)
 
                 Text(
@@ -140,13 +143,12 @@ private fun WalletInfoDialog(model: WalletInfoDialogModel, callback: MainScreenA
                     color = MnemonicWalletRecoverTheme.colors.primaryLabel
                 )
 
-                Button(
-                    modifier = Modifier.padding(top = 35.dp),
-                    onClick = {
-                        callback.copyPrivateKeyClick()
-                    }) {
-                    Text(text = model.copyButton)
-                }
+                LoadingButton(
+                    modifier = Modifier
+                        .padding(top = 35.dp)
+                        .height(MnemonicWalletRecoverTheme.dimensions.buttonHeight),
+                    model = model.copyButton,
+                ) { callback.copyPrivateKeyClick() }
             }
         }
     }
@@ -192,7 +194,8 @@ fun DefaultPreview() {
             ),
             LoadingButtonModel("Generate Wallet", false),
             WalletInfoDialogModel(
-                "Wallet", "o14n132o123no3", "32981312932", "Copy"
+                "Wallet", "o14n132o123no3", "32981312932",
+                LoadingButtonModel("Button", false)
             ),
             object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {

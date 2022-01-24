@@ -13,7 +13,8 @@ fun MnemonicWalletRecoverAppTheme(
 ) {
     CompositionLocalProvider(
         localAppColors provides if (darkTheme) DarkAppColors else LightAppColors,
-        localAppTypography provides MnemonicWalletRecoverTypography
+        localAppTypography provides MnemonicWalletRecoverTypography,
+        localAppDimensions provides DefaultAppDimensions
     ) {
         MaterialTheme(
 //            colors = MnemonicWalletRecoverTheme.colors, // TODO
@@ -26,8 +27,10 @@ fun MnemonicWalletRecoverAppTheme(
 
 val localAppColors = staticCompositionLocalOf { DefaultAppColors }
 val localAppTypography = staticCompositionLocalOf { DefaultAppTypography }
+val localAppDimensions = staticCompositionLocalOf { DefaultAppDimensions }
 
 object MnemonicWalletRecoverTheme {
+    val dimensions: AppDimensions @Composable get() = localAppDimensions.current
     val colors: AppColors @Composable get() = localAppColors.current
     val typography: AppTypography @Composable get() = localAppTypography.current
 }
