@@ -18,8 +18,8 @@ import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 @Composable
 fun LoadingButton(
     modifier: Modifier,
-    model: LoadingButtonModel,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    model: LoadingButtonModel
 ) {
     Button(
         modifier = modifier,
@@ -54,8 +54,9 @@ fun PreviewLoadingButtonIsNotLoading() {
             model = LoadingButtonModel(
                 "Create Wallet",
                 isLoading = false
-            )
-        ) {  }
+            ),
+            onClick = {}
+        )
     }
 }
 
@@ -69,8 +70,9 @@ fun PreviewLoadingButtonIsLoading() {
             model = LoadingButtonModel(
                 "Loading...",
                 isLoading = true
-            )
-        ) {  }
+            ),
+            onClick = {}
+        )
     }
 }
 

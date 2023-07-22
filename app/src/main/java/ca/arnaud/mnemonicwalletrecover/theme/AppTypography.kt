@@ -14,14 +14,16 @@ data class AppTypography(
     val h1: TextStyle,
     val h2: TextStyle,
     val body1: TextStyle,
-    val button1: TextStyle
+    val button1: TextStyle,
+    val label: TextStyle,
 )
 
 val DefaultAppTypography = AppTypography(
     h1 = TextStyle.Default,
     h2 = TextStyle.Default,
     body1 = TextStyle.Default,
-    button1 = TextStyle.Default
+    button1 = TextStyle.Default,
+    label = TextStyle.Default,
 )
 
 val MnemonicWalletRecoverTypography: AppTypography
@@ -40,7 +42,11 @@ val MnemonicWalletRecoverTypography: AppTypography
         button1 = createTextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
-        )
+        ),
+        label = createTextStyle(
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal
+        ),
     )
 
 private val defaultTextColor
