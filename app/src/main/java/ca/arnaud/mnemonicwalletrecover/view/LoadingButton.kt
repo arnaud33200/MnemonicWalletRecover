@@ -39,7 +39,10 @@ fun LoadingButton(
             text = model.title,
             textAlign = TextAlign.Center,
             style = MnemonicWalletRecoverTheme.typography.button1,
-            color = MnemonicWalletRecoverTheme.colors.labelOnPrimary
+            color = when (model.isLoading) {
+                true -> MnemonicWalletRecoverTheme.colors.labelOnPrimary
+                false -> MnemonicWalletRecoverTheme.colors.onSecondary
+            }
         )
     }
 }
