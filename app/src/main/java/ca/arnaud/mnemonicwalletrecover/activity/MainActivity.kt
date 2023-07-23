@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreen
-import ca.arnaud.mnemonicwalletrecover.screen.MainScreenActionCallback
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 import ca.arnaud.mnemonicwalletrecover.viewmodel.MainViewModel
@@ -30,8 +29,11 @@ class MainActivity : ComponentActivity() {
                     val dialog = viewModel.dialog.collectAsState().value
 
                     MainScreen(
-                        screenModel, walletWordsModel,
-                        button, dialog, viewModel
+                        model = screenModel,
+                        walletWordsModel = { walletWordsModel },
+                        button = button,
+                        dialog = dialog,
+                        callback = viewModel
                     )
                 }
             }

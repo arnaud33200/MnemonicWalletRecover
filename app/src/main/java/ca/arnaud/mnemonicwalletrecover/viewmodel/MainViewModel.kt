@@ -3,8 +3,8 @@ package ca.arnaud.mnemonicwalletrecover.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.arnaud.MnemonicWalletRecover.R
-import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.domain.model.CreateWalletParams
+import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletWordsModelFactory
@@ -51,9 +51,7 @@ class MainViewModel @Inject constructor(
     val dialog: StateFlow<WalletInfoDialogModel?> = _dialog
 
     private fun generateWalletWordsModel(): WalletWordsModel {
-        return walletWordsModelFactory.create(words) { text, index ->
-            updateWalletWord(text, index)
-        }
+        return walletWordsModelFactory.create(words)
     }
 
     private fun updateWalletWord(text: String, index: Int) {
@@ -102,6 +100,10 @@ class MainViewModel @Inject constructor(
 
     override fun copyPrivateKeyClick() {
         // TODO - use case to copy key
+    }
+
+    override fun onWordFieldChanged(index: Int, text: String) {
+        updateWalletWord(text, index)
     }
 
     // region

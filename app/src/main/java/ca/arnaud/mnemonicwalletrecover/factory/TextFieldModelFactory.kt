@@ -8,10 +8,8 @@ class TextFieldModelFactory @Inject constructor() {
     fun create(
         value: String,
         enable: Boolean = true,
-        changeCallback: (String) -> Unit = {}
     ) = TextFieldModel(
         value = value,
         enabled = enable,
-        changeCallback = changeCallback
     )
 }

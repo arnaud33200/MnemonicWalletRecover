@@ -7,10 +7,15 @@ class WalletWordsModelFactory @Inject constructor(
     private val textFieldModelFactory: TextFieldModelFactory
 ) {
 
-    fun create(words: List<String>, callback: (String, Int) -> Unit): WalletWordsModel {
+    fun create(
+        words: List<String>,
+    ): WalletWordsModel {
         return WalletWordsModel(
             words.mapIndexed { index, word ->
-                textFieldModelFactory.create(word, true) { text -> callback(text, index) }
+                textFieldModelFactory.create(
+                    value = word,
+                    enable = true
+                )
             }
         )
     }

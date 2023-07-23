@@ -64,7 +64,8 @@ sealed interface WordTextFieldTheme {
 fun WordTextField(
     modifier: Modifier,
     doneClick: () -> Unit,
-    wordField: TextFieldModel,
+    onValueChange: (String) -> Unit,
+    wordField: () -> TextFieldModel,
     number: Int,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     focusRequester: FocusRequester,
@@ -74,10 +75,9 @@ fun WordTextField(
         modifier = modifier,
     ) {
         var theme by remember { mutableStateOf<WordTextFieldTheme>(WordTextFieldTheme.UnFocus) }
-
-        TextField(
+        ActualWordTextField(
             modifier = Modifier
-                .alpha(if (wordField.enabled) 1f else 0.3f)
+                .alpha(if (wordField().enabled) 1f else 0.3f)
                 .padding(top = 8.dp)
                 .padding(horizontal = 5.dp)
                 .border(
@@ -94,25 +94,15 @@ fun WordTextField(
                     }
                 }
                 .focusProperties {
-                                 // Crash for some reason ...
+                    // Crash for some reason ...
 //                    nextFocusRequester?.requestFocus()
                 },
+            onValueChange = onValueChange,
+            enabled = { wordField().enabled },
+            value = { wordField().value },
             keyboardOptions = keyboardOptions,
             keyboardActions = KeyboardActions(
                 onDone = { doneClick() }
-            ),
-            textStyle = MnemonicWalletRecoverTheme.typography.body1.copy(
-                textAlign = TextAlign.Center,
-                color = MnemonicWalletRecoverTheme.colors.primaryLabel
-            ),
-            singleLine = true,
-            enabled = wordField.enabled,
-            value = wordField.value,
-            onValueChange = wordField.changeCallback,
-            colors = TextFieldDefaults.textFieldColors(
-                cursorColor = MnemonicWalletRecoverTheme.colors.primaryLabel,
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
             )
         )
 
@@ -131,6 +121,36 @@ fun WordTextField(
     }
 }
 
+@Composable
+fun ActualWordTextField(
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit,
+    enabled: () -> Boolean,
+    value: () -> String,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+) {
+
+    TextField(
+        modifier = modifier,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        textStyle = MnemonicWalletRecoverTheme.typography.body1.copy(
+            textAlign = TextAlign.Center,
+            color = MnemonicWalletRecoverTheme.colors.primaryLabel
+        ),
+        singleLine = true,
+        enabled = enabled(),
+        value = value(),
+        onValueChange = onValueChange,
+        colors = TextFieldDefaults.textFieldColors(
+            cursorColor = MnemonicWalletRecoverTheme.colors.primaryLabel,
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        )
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun WordTextFieldDefaultPreview() {
@@ -138,7 +158,8 @@ fun WordTextFieldDefaultPreview() {
         WordTextField(
             modifier = Modifier,
             doneClick = {},
-            wordField = TextFieldModel("Dolphin"),
+            onValueChange = { },
+            wordField = { TextFieldModel( value = "Dolphin" ) },
             focusRequester = remember { FocusRequester() },
             nextFocusRequester = null,
             number = 666,

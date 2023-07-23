@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -29,6 +30,8 @@ interface MainScreenActionCallback {
     fun dismissWalletInfoDialogClick()
 
     fun copyPrivateKeyClick()
+
+    fun onWordFieldChanged(index: Int, text: String)
 }
 
 object MainScreenSettings {
@@ -39,7 +42,7 @@ object MainScreenSettings {
 @Composable
 fun MainScreen(
     model: MainScreenModel,
-    walletWordsModel: WalletWordsModel,
+    walletWordsModel: () -> WalletWordsModel,
     button: LoadingButtonModel,
     dialog: WalletInfoDialogModel?,
     callback: MainScreenActionCallback
@@ -62,8 +65,9 @@ fun MainScreen(
         )
 
         val columnCount = WALLET_WORDS_COLUMNS
-        val rowCount = walletWordsModel.wordFields.size / columnCount
-        val focusRequesters = List(walletWordsModel.wordFields.size) { FocusRequester() }
+        val wordFields = walletWordsModel().wordFields
+        val rowCount = wordFields.size / columnCount
+        val focusRequesters = remember { List(wordFields.size) { FocusRequester() } }
         val keyboardController = LocalSoftwareKeyboardController.current
 
         for (y in 0 until rowCount) {
@@ -72,19 +76,26 @@ fun MainScreen(
             ) {
                 for (x in 0 until columnCount) {
                     val index = (y * columnCount) + x
-                    val wordField = walletWordsModel.wordFields[index]
-                    val focusRequester = focusRequesters[index]
-                    val nextFocusRequester = focusRequesters.getOrNull(index + 1)
+                    val wordField = wordFields.getOrNull(index) ?: TextFieldModel()
+                    val focusRequester = focusRequesters.getOrNull(index)
+                    val nextFocusRequesterIndex = wordFields.indexOfFirst { textFieldModel ->
+                        textFieldModel.value.isBlank()
+                    }
+                    val nextFocusRequester = focusRequesters.getOrNull(nextFocusRequesterIndex)
+
                     WordTextField(
                         modifier = Modifier
                             .weight(1F),
-                        wordField = wordField,
+                        wordField = { wordField },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
                         ),
-                        focusRequester = focusRequester,
+                        focusRequester = focusRequester ?: FocusRequester(),
                         nextFocusRequester = nextFocusRequester,
                         number = index + 1,
+                        onValueChange = { value ->
+                            callback.onWordFieldChanged(index, value)
+                        },
                         doneClick = {
                             keyboardController?.hide()
                             callback.recoverWalletButtonClick()
@@ -123,26 +134,20 @@ fun DefaultPreview() {
             MainScreenModel(
                 title = "Enter your 12 words"
             ),
-            WalletWordsModel(
-                List(12) { "Word ${it + 1}" }.map { value ->
-                    TextFieldModel(value, true) { }
-                }
-            ),
+            {
+                WalletWordsModel(
+                    List(12) { "Word ${it + 1}" }.map { value ->
+                        TextFieldModel(value, true)
+                    }
+                )
+            },
             LoadingButtonModel("Generate Wallet", false),
             null,
             object : MainScreenActionCallback {
-                override fun recoverWalletButtonClick() {
-
-                }
-
-                override fun dismissWalletInfoDialogClick() {
-
-                }
-
-                override fun copyPrivateKeyClick() {
-
-                }
-
+                override fun recoverWalletButtonClick() {}
+                override fun dismissWalletInfoDialogClick() {}
+                override fun copyPrivateKeyClick() {}
+                override fun onWordFieldChanged(index: Int, text: String) {}
             }
         )
     }
