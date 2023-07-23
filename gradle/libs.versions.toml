@@ -1,0 +1,16 @@
+[versions]
+
+# DI
+daggerHiltVersion = "2.44"
+javaxInjectVersion = "1"
+androidHiltVersion = "1.0.0"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[libraries]
+
+# DI
+dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "daggerHiltVersion" }
+dagger-hiltCompiler = { module = "com.google.dagger:hilt-compiler", version.ref = "daggerHiltVersion" }
+javaxInject = { module = "javax.inject:javax.inject", version.ref = "javaxInjectVersion" }
+android-hiltWork = { module = "androidx.hilt:hilt-work", version.ref = "androidHiltVersion" }
+android-hiltCompiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidHiltVersion" }

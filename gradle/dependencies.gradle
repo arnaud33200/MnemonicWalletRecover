@@ -1,12 +1,12 @@
 ext {
-    kotlinVersion = "1.5.31"
+    kotlinVersion = "1.8.0"
     javaxInjectVersion = "1"
-    coroutinesCoreVersion = "1.4.2"
+    coroutinesCoreVersion = "1.7.2"
 
-    composeVersion = '1.0.5'
-    composeActivityVersion = '1.4.0'
+    composeVersion = '1.4.3'
+    composeActivityVersion = '1.7.2'
 
-    hiltVersion = '2.38.1'
+    hiltVersion = '2.44'
     hiltViewModelVersion = '1.0.0-alpha03'
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

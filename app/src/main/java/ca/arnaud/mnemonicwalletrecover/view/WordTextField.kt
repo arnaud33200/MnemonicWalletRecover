@@ -19,7 +19,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -86,14 +86,17 @@ fun WordTextField(
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(top = 3.dp)
+                .focusRequester(focusRequester)
                 .onFocusChanged { state ->
                     theme = when {
                         state.isFocused -> WordTextFieldTheme.Focus
                         else -> WordTextFieldTheme.UnFocus
                     }
                 }
-                .focusRequester(focusRequester)
-                .focusOrder { nextFocusRequester?.requestFocus() },
+                .focusProperties {
+                                 // Crash for some reason ...
+//                    nextFocusRequester?.requestFocus()
+                },
             keyboardOptions = keyboardOptions,
             keyboardActions = KeyboardActions(
                 onDone = { doneClick() }
