@@ -1,6 +1,6 @@
 package ca.arnaud.domain.model
 
 data class CreateWalletParams(
-    val words: String,
+    val words: MnemonicList<String>,
     val password: String = ""
 )

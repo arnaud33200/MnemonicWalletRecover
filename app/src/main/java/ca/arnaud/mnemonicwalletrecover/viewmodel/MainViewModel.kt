@@ -10,7 +10,6 @@ import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
-import ca.arnaud.mnemonicwalletrecover.mapper.ListToWalletWordsMapper
 import ca.arnaud.mnemonicwalletrecover.model.LoadingButtonModel
 import ca.arnaud.mnemonicwalletrecover.model.MainScreenModel
 import ca.arnaud.mnemonicwalletrecover.model.WalletInfoDialogModel
@@ -28,7 +27,6 @@ class MainViewModel @Inject constructor(
     private val mainScreenModelFactory: MainScreenModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
-    private val listToWalletWordsMapper: ListToWalletWordsMapper,
     private val mnemonicWordFormatter: MnemonicWordFormatter,
 ) : ViewModel(), MainScreenActionCallback {
 
@@ -36,7 +34,7 @@ class MainViewModel @Inject constructor(
     val screenModel: StateFlow<MainScreenModel> = _screenModel
 
     private val _wordValues = MutableStateFlow(MnemonicList { "" })
-    val wordValues: StateFlow<List<String>> = _wordValues
+    val wordValues: StateFlow<MnemonicList<String>> = _wordValues
 
     private val _button = MutableStateFlow(getDefaultButton())
     val button: StateFlow<LoadingButtonModel> = _button
@@ -78,7 +76,8 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val wallet = generateCryptoWallet.execute(
                 CreateWalletParams(
-                    words = listToWalletWordsMapper.mapTo(wordValues.value)
+                    words = wordValues.value,
+                    password = "" // TODO - add field
                 )
             )
 
