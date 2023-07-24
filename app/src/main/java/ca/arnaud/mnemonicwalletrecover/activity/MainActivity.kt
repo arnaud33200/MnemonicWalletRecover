@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         model = screenModel,
                         wordValues = { index -> wordValues.getOrNull(index) ?: "" },
-                        button = button,
+                        button = { button },
                         dialog = dialog,
                         callback = viewModel
                     )

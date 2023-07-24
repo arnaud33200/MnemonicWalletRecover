@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import ca.arnaud.mnemonicwalletrecover.model.*
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings.WALLET_WORDS_COLUMNS
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
+import ca.arnaud.mnemonicwalletrecover.theme.localAppColors
 import ca.arnaud.mnemonicwalletrecover.view.LoadingButton
 import ca.arnaud.mnemonicwalletrecover.view.WalletInfoDialog
 import ca.arnaud.mnemonicwalletrecover.view.WordFieldGridItem
@@ -48,48 +50,58 @@ object MainScreenSettings {
 fun MainScreen(
     model: MainScreenModel,
     wordValues: (Int) -> String,
-    button: LoadingButtonModel,
+    button: () -> LoadingButtonModel,
     dialog: WalletInfoDialogModel?,
     callback: MainScreenActionCallback
 ) {
-//    val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
+    val keyboardController = LocalSoftwareKeyboardController.current
+    Scaffold(
+        backgroundColor = localAppColors.current.background, // TODO - not set after moving theme fully to material
+        topBar = {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp),
+                text = model.title,
+                textAlign = TextAlign.Center,
+                style = MnemonicWalletRecoverTheme.typography.h2,
+                color = MnemonicWalletRecoverTheme.colors.primaryLabel
+            )
+        },
+        content = { paddingValues ->
+            //    val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
 //            .verticalScroll(scrollState), // Doesn't work with lazyVerticalGrid but just don't need it?
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
-            text = model.title,
-            textAlign = TextAlign.Center,
-            style = MnemonicWalletRecoverTheme.typography.h1,
-            color = MnemonicWalletRecoverTheme.colors.primaryLabel
-        )
-
-        val keyboardController = LocalSoftwareKeyboardController.current
-
-        WordFieldGrid(
-            modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
-            wordFields = model.wordFields,
-            wordValues = wordValues,
-            onValueChanged = callback::onWordFieldChanged,
-            onDoneClick = callback::recoverWalletButtonClick,
-            keyboardController = keyboardController,
-        )
-
-        LoadingButton(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .height(50.dp),
-            model = button,
-            onClick = {
-                keyboardController?.hide()
-                callback.recoverWalletButtonClick()
-            },
-        )
-    }
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                WordFieldGrid(
+                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
+                    wordFields = model.wordFields,
+                    wordValues = wordValues,
+                    onValueChanged = callback::onWordFieldChanged,
+                    onDoneClick = callback::recoverWalletButtonClick,
+                    keyboardController = keyboardController,
+                )
+            }
+        },
+        bottomBar = {
+            LoadingButton(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                model = button(),
+                onClick = {
+                    keyboardController?.hide()
+                    callback.recoverWalletButtonClick()
+                }
+            )
+        }
+    )
 
     dialog?.let { dialogModel ->
         WalletInfoDialog(
@@ -130,11 +142,13 @@ private fun WordFieldGrid(
                 model = item,
                 wordValue = wordValues(index),
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
+                    // TODO enable when fix
+//                    imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
                     onNext = {
-                        nextFocusRequester?.requestFocus()
+//                        nextFocusRequester?.requestFocus()
                     },
                     onDone = {
                         keyboardController?.hide()
@@ -159,7 +173,7 @@ fun DefaultPreview() {
                 wordFields = MnemonicList { "${it + 1}" }.map { label -> TextFieldModel(label) }
             ),
             wordValues = { index -> "Word ${index + 1}" },
-            button = LoadingButtonModel("Generate Wallet", false),
+            button = { LoadingButtonModel("Generate Wallet", false) },
             dialog = null,
             callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
