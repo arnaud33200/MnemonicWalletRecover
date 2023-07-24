@@ -3,6 +3,7 @@ package ca.arnaud.mnemonicwalletrecover.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.arnaud.MnemonicWalletRecover.R
+import ca.arnaud.domain.formatter.MnemonicWordFormatter
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.MnemonicList
 import ca.arnaud.domain.usecase.GenerateCryptoWallet
@@ -27,7 +28,8 @@ class MainViewModel @Inject constructor(
     private val mainScreenModelFactory: MainScreenModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
-    private val listToWalletWordsMapper: ListToWalletWordsMapper
+    private val listToWalletWordsMapper: ListToWalletWordsMapper,
+    private val mnemonicWordFormatter: MnemonicWordFormatter,
 ) : ViewModel(), MainScreenActionCallback {
 
     private val _screenModel = MutableStateFlow(mainScreenModelFactory.create())
@@ -97,7 +99,7 @@ class MainViewModel @Inject constructor(
         _wordValues.update { list ->
             MnemonicList { i ->
                 when (i) {
-                    index -> text
+                    index -> mnemonicWordFormatter.format(text)
                     else -> list[i]
                 }
             }
