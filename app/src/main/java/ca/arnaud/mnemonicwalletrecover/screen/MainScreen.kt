@@ -46,7 +46,6 @@ object MainScreenSettings {
 @Composable
 fun MainScreen(
     model: MainScreenModel,
-    walletWordsModel: () -> WalletWordsModel,
     wordValues: (Int) -> String,
     button: LoadingButtonModel,
     dialog: WalletInfoDialogModel?,
@@ -72,7 +71,7 @@ fun MainScreen(
 
         WordFieldGrid(
             modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
-            walletWordsModel = walletWordsModel,
+            wordFields = model.wordFields,
             wordValues = wordValues,
             onValueChanged = callback::onWordFieldChanged,
             onDoneClick = callback::recoverWalletButtonClick,
@@ -104,20 +103,19 @@ fun MainScreen(
 @Composable
 private fun WordFieldGrid(
     modifier: Modifier = Modifier,
-    walletWordsModel: () -> WalletWordsModel,
+    wordFields: List<TextFieldModel>,
     wordValues: (Int) -> String,
     onValueChanged: (Int, String) -> Unit,
     onDoneClick: () -> Unit,
     keyboardController: SoftwareKeyboardController?
 ) {
-    val items = walletWordsModel().wordFields
-    val focusRequesters = remember { List(items.size) { FocusRequester() } }
+    val focusRequesters = remember { List(wordFields.size) { FocusRequester() } }
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(WALLET_WORDS_COLUMNS),
     ) {
         itemsIndexed(
-            items = items,
+            items = wordFields,
             key = { _, item -> item.label },
         ) { index, item ->
             val focusRequester = remember { focusRequesters[index] }
@@ -155,13 +153,9 @@ fun DefaultPreview() {
     MnemonicWalletRecoverAppTheme {
         MainScreen(
             model = MainScreenModel(
-                title = "Enter your 12 words"
+                title = "Enter your 12 words",
+                wordFields = List(12) { "${it + 1}" }.map { label -> TextFieldModel(label) }
             ),
-            walletWordsModel = {
-                WalletWordsModel(
-                    List(12) { "${it + 1}" }.map { label -> TextFieldModel(label) }
-                )
-            },
             wordValues = { index -> "Word ${index + 1}" },
             button = LoadingButtonModel("Generate Wallet", false),
             dialog = null,

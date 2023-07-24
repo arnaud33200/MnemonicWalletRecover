@@ -6,13 +6,12 @@ import ca.arnaud.MnemonicWalletRecover.R
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
+import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
-import ca.arnaud.mnemonicwalletrecover.factory.WalletWordsModelFactory
 import ca.arnaud.mnemonicwalletrecover.mapper.ListToWalletWordsMapper
 import ca.arnaud.mnemonicwalletrecover.model.LoadingButtonModel
 import ca.arnaud.mnemonicwalletrecover.model.MainScreenModel
 import ca.arnaud.mnemonicwalletrecover.model.WalletInfoDialogModel
-import ca.arnaud.mnemonicwalletrecover.model.WalletWordsModel
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenActionCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,37 +23,27 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val generateCryptoWallet: GenerateCryptoWallet,
-    private val walletWordsModelFactory: WalletWordsModelFactory,
+    private val mainScreenModelFactory: MainScreenModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
     private val listToWalletWordsMapper: ListToWalletWordsMapper
 ) : ViewModel(), MainScreenActionCallback {
 
     companion object {
-        const val DEFAULT_WORDS_COUNT = 12
+        const val DEFAULT_WORDS_COUNT = 12 // TODO - create a domain MnemonicList to force 12
     }
 
-    val screenModel: StateFlow<MainScreenModel> = MutableStateFlow(
-        MainScreenModel( // TODO - call from factory
-            title = "Enter your 12 words" // TODO - put in string
-        )
-    )
+    val _screenModel = MutableStateFlow(mainScreenModelFactory.create(DEFAULT_WORDS_COUNT))
+    val screenModel: StateFlow<MainScreenModel> = _screenModel
 
     private val _wordValues = MutableStateFlow(List(DEFAULT_WORDS_COUNT) { "" })
     val wordValues: StateFlow<List<String>> = _wordValues
-
-    private val _walletWordsModel = MutableStateFlow(generateWalletWordsModel())
-    val walletWordsModel: StateFlow<WalletWordsModel> = _walletWordsModel
 
     private val _button = MutableStateFlow(getDefaultButton())
     val button: StateFlow<LoadingButtonModel> = _button
 
     private val _dialog = MutableStateFlow<WalletInfoDialogModel?>(null)
     val dialog: StateFlow<WalletInfoDialogModel?> = _dialog
-
-    private fun generateWalletWordsModel(): WalletWordsModel {
-        return walletWordsModelFactory.create(wordValues.value)
-    }
 
     private fun getDefaultButton(): LoadingButtonModel {
         return loadingButtonModelFactory.create(
@@ -67,12 +56,20 @@ class MainViewModel @Inject constructor(
             titleRes = R.string.generating_wallet_button,
             isLoading = true
         )
-        _walletWordsModel.value = walletWordsModelFactory.createDisabled(wordValues.value)
+        enableFields(false)
     }
 
     private fun hideLoader() {
         _button.value = getDefaultButton()
-        _walletWordsModel.value = generateWalletWordsModel()
+        enableFields(true)
+    }
+
+    private fun enableFields(enabled: Boolean) {
+        _screenModel.update { model ->
+            model.copy(wordFields = model.wordFields.map { field ->
+                field.copy(enabled = enabled)
+            })
+        }
     }
 
     // region Click Action

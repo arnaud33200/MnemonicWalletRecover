@@ -14,21 +14,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import ca.arnaud.mnemonicwalletrecover.model.WalletWordsModel
+import ca.arnaud.mnemonicwalletrecover.model.TextFieldModel
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LegacyWordFieldGrid(
     modifier: Modifier = Modifier,
-    walletWordsModel: () -> WalletWordsModel,
+    wordFields: List<TextFieldModel>,
     wordValues: (Int) -> String,
     onValueChanged: (Int, String) -> Unit,
     onDoneClick: () -> Unit,
     keyboardController: SoftwareKeyboardController?
 ) {
     val columnCount = MainScreenSettings.WALLET_WORDS_COLUMNS
-    val wordFields = walletWordsModel().wordFields
     val rowCount = remember { wordFields.size / columnCount }
     val focusRequesters = remember { List(wordFields.size) { FocusRequester() } }
     //        val keyboardController = LocalSoftwareKeyboardController.current
