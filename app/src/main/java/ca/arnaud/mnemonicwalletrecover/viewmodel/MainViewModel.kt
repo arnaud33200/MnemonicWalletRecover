@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.arnaud.MnemonicWalletRecover.R
 import ca.arnaud.domain.model.CreateWalletParams
+import ca.arnaud.domain.model.MnemonicList
 import ca.arnaud.domain.usecase.GenerateCryptoWallet
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
@@ -29,14 +30,10 @@ class MainViewModel @Inject constructor(
     private val listToWalletWordsMapper: ListToWalletWordsMapper
 ) : ViewModel(), MainScreenActionCallback {
 
-    companion object {
-        const val DEFAULT_WORDS_COUNT = 12 // TODO - create a domain MnemonicList to force 12
-    }
-
-    val _screenModel = MutableStateFlow(mainScreenModelFactory.create(DEFAULT_WORDS_COUNT))
+    private val _screenModel = MutableStateFlow(mainScreenModelFactory.create())
     val screenModel: StateFlow<MainScreenModel> = _screenModel
 
-    private val _wordValues = MutableStateFlow(List(DEFAULT_WORDS_COUNT) { "" })
+    private val _wordValues = MutableStateFlow(MnemonicList { "" })
     val wordValues: StateFlow<List<String>> = _wordValues
 
     private val _button = MutableStateFlow(getDefaultButton())
@@ -98,7 +95,7 @@ class MainViewModel @Inject constructor(
 
     override fun onWordFieldChanged(index: Int, text: String) {
         _wordValues.update { list ->
-            List(list.size) { i ->
+            MnemonicList { i ->
                 when (i) {
                     index -> text
                     else -> list[i]

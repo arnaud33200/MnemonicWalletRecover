@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ca.arnaud.domain.model.MnemonicList
 import ca.arnaud.mnemonicwalletrecover.model.*
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings.WALLET_WORDS_COLUMNS
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
@@ -119,7 +120,8 @@ private fun WordFieldGrid(
             key = { _, item -> item.label },
         ) { index, item ->
             val focusRequester = remember { focusRequesters[index] }
-            val nextFocusRequesterIndex = index + 1 // TODO - look at the values and put next for first empty vallule
+            val nextFocusRequesterIndex =
+                index + 1 // TODO - look at the values and put next for first empty vallule
             val nextFocusRequester = focusRequesters.getOrNull(nextFocusRequesterIndex)
             WordFieldGridItem(
                 modifier = Modifier
@@ -154,7 +156,7 @@ fun DefaultPreview() {
         MainScreen(
             model = MainScreenModel(
                 title = "Enter your 12 words",
-                wordFields = List(12) { "${it + 1}" }.map { label -> TextFieldModel(label) }
+                wordFields = MnemonicList { "${it + 1}" }.map { label -> TextFieldModel(label) }
             ),
             wordValues = { index -> "Word ${index + 1}" },
             button = LoadingButtonModel("Generate Wallet", false),
