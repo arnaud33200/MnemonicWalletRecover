@@ -1,9 +1,11 @@
 package ca.arnaud.mnemonicwalletrecover.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -11,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +26,7 @@ import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 import ca.arnaud.mnemonicwalletrecover.view.LoadingButton
 import ca.arnaud.mnemonicwalletrecover.view.WalletInfoDialog
-import ca.arnaud.mnemonicwalletrecover.view.WordTextField
+import ca.arnaud.mnemonicwalletrecover.view.WordFieldGridItem
 
 interface MainScreenActionCallback {
     fun recoverWalletButtonClick()
@@ -43,16 +47,16 @@ object MainScreenSettings {
 fun MainScreen(
     model: MainScreenModel,
     walletWordsModel: () -> WalletWordsModel,
+    wordValues: (Int) -> String,
     button: LoadingButtonModel,
     dialog: WalletInfoDialogModel?,
     callback: MainScreenActionCallback
 ) {
-    val scrollState = rememberScrollState()
-
+//    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
+            .fillMaxSize(),
+//            .verticalScroll(scrollState), // Doesn't work with lazyVerticalGrid but just don't need it?
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -64,46 +68,16 @@ fun MainScreen(
             color = MnemonicWalletRecoverTheme.colors.primaryLabel
         )
 
-        val columnCount = WALLET_WORDS_COLUMNS
-        val wordFields = walletWordsModel().wordFields
-        val rowCount = wordFields.size / columnCount
-        val focusRequesters = remember { List(wordFields.size) { FocusRequester() } }
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        for (y in 0 until rowCount) {
-            Row(
-                modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp)
-            ) {
-                for (x in 0 until columnCount) {
-                    val index = (y * columnCount) + x
-                    val wordField = wordFields.getOrNull(index) ?: TextFieldModel()
-                    val focusRequester = focusRequesters.getOrNull(index)
-                    val nextFocusRequesterIndex = wordFields.indexOfFirst { textFieldModel ->
-                        textFieldModel.value.isBlank()
-                    }
-                    val nextFocusRequester = focusRequesters.getOrNull(nextFocusRequesterIndex)
-
-                    WordTextField(
-                        modifier = Modifier
-                            .weight(1F),
-                        wordField = { wordField },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
-                        ),
-                        focusRequester = focusRequester ?: FocusRequester(),
-                        nextFocusRequester = nextFocusRequester,
-                        number = index + 1,
-                        onValueChange = { value ->
-                            callback.onWordFieldChanged(index, value)
-                        },
-                        doneClick = {
-                            keyboardController?.hide()
-                            callback.recoverWalletButtonClick()
-                        }
-                    )
-                }
-            }
-        }
+        WordFieldGrid(
+            modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
+            walletWordsModel = walletWordsModel,
+            wordValues = wordValues,
+            onValueChanged = callback::onWordFieldChanged,
+            onDoneClick = callback::recoverWalletButtonClick,
+            keyboardController = keyboardController,
+        )
 
         LoadingButton(
             modifier = Modifier
@@ -126,24 +100,72 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun WordFieldGrid(
+    modifier: Modifier = Modifier,
+    walletWordsModel: () -> WalletWordsModel,
+    wordValues: (Int) -> String,
+    onValueChanged: (Int, String) -> Unit,
+    onDoneClick: () -> Unit,
+    keyboardController: SoftwareKeyboardController?
+) {
+    val items = walletWordsModel().wordFields
+    val focusRequesters = remember { List(items.size) { FocusRequester() } }
+    LazyVerticalGrid(
+        modifier = modifier,
+        columns = GridCells.Fixed(WALLET_WORDS_COLUMNS),
+    ) {
+        itemsIndexed(
+            items = items,
+            key = { _, item -> item.label },
+        ) { index, item ->
+            val focusRequester = remember { focusRequesters[index] }
+            val nextFocusRequesterIndex = index + 1 // TODO - look at the values and put next for first empty vallule
+            val nextFocusRequester = focusRequesters.getOrNull(nextFocusRequesterIndex)
+            WordFieldGridItem(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .padding(vertical = 5.dp),
+                model = item,
+                wordValue = wordValues(index),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = if (nextFocusRequester != null) ImeAction.Next else ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        nextFocusRequester?.requestFocus()
+                    },
+                    onDone = {
+                        keyboardController?.hide()
+                        onDoneClick()
+                    }
+                ),
+                onValueChange = { value ->
+                    onValueChanged(index, value)
+                },
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     MnemonicWalletRecoverAppTheme {
         MainScreen(
-            MainScreenModel(
+            model = MainScreenModel(
                 title = "Enter your 12 words"
             ),
-            {
+            walletWordsModel = {
                 WalletWordsModel(
-                    List(12) { "Word ${it + 1}" }.map { value ->
-                        TextFieldModel(value, true)
-                    }
+                    List(12) { "${it + 1}" }.map { label -> TextFieldModel(label) }
                 )
             },
-            LoadingButtonModel("Generate Wallet", false),
-            null,
-            object : MainScreenActionCallback {
+            wordValues = { index -> "Word ${index + 1}" },
+            button = LoadingButtonModel("Generate Wallet", false),
+            dialog = null,
+            callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
                 override fun dismissWalletInfoDialogClick() {}
                 override fun copyPrivateKeyClick() {}

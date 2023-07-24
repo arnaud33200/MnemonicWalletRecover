@@ -1,10 +1,11 @@
 package ca.arnaud.mnemonicwalletrecover.factory
 
+import ca.arnaud.mnemonicwalletrecover.model.TextFieldModel
 import ca.arnaud.mnemonicwalletrecover.model.WalletWordsModel
 import javax.inject.Inject
 
+// TODO - merge with screen model factory
 class WalletWordsModelFactory @Inject constructor(
-    private val textFieldModelFactory: TextFieldModelFactory
 ) {
 
     fun create(
@@ -12,9 +13,9 @@ class WalletWordsModelFactory @Inject constructor(
     ): WalletWordsModel {
         return WalletWordsModel(
             words.mapIndexed { index, word ->
-                textFieldModelFactory.create(
-                    value = word,
-                    enable = true
+                TextFieldModel(
+                    label = index.toString(),
+                    enabled = true
                 )
             }
         )
@@ -22,7 +23,12 @@ class WalletWordsModelFactory @Inject constructor(
 
     fun createDisabled(words: List<String>): WalletWordsModel {
         return WalletWordsModel(
-            words.map { word -> textFieldModelFactory.create(word, false) }
+            words.mapIndexed { index, word ->
+                TextFieldModel(
+                    label = index.toString(),
+                    enabled = false,
+                )
+            }
         )
     }
 }

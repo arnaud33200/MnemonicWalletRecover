@@ -1,6 +1,6 @@
 package ca.arnaud.mnemonicwalletrecover.model
 
 data class TextFieldModel(
-    val value: String = "",
+    val label: String = "", // TODO rename label
     val enabled: Boolean = true,
 )

@@ -25,12 +25,14 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
                     val screenModel = viewModel.screenModel.collectAsState().value
                     val walletWordsModel = viewModel.walletWordsModel.collectAsState().value
+                    val wordValues = viewModel.wordValues.collectAsState().value
                     val button = viewModel.button.collectAsState().value
                     val dialog = viewModel.dialog.collectAsState().value
 
                     MainScreen(
                         model = screenModel,
                         walletWordsModel = { walletWordsModel },
+                        wordValues = { index -> wordValues.getOrNull(index) ?: "" },
                         button = button,
                         dialog = dialog,
                         callback = viewModel

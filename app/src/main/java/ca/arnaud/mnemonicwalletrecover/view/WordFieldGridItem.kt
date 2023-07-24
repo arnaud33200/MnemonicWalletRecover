@@ -18,9 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -61,23 +58,22 @@ sealed interface WordTextFieldTheme {
 }
 
 @Composable
-fun WordTextField(
+fun WordFieldGridItem(
     modifier: Modifier,
-    doneClick: () -> Unit,
     onValueChange: (String) -> Unit,
-    wordField: () -> TextFieldModel,
-    number: Int,
+    model: TextFieldModel,
+    wordValue: String,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    focusRequester: FocusRequester,
-    nextFocusRequester: FocusRequester?,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     Box(
         modifier = modifier,
     ) {
         var theme by remember { mutableStateOf<WordTextFieldTheme>(WordTextFieldTheme.UnFocus) }
-        ActualWordTextField(
+        val enabled = model.enabled
+        WordTextField(
             modifier = Modifier
-                .alpha(if (wordField().enabled) 1f else 0.3f)
+                .alpha(if (enabled) 1f else 0.3f)
                 .padding(top = 8.dp)
                 .padding(horizontal = 5.dp)
                 .border(
@@ -86,24 +82,17 @@ fun WordTextField(
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(top = 3.dp)
-                .focusRequester(focusRequester)
                 .onFocusChanged { state ->
                     theme = when {
                         state.isFocused -> WordTextFieldTheme.Focus
                         else -> WordTextFieldTheme.UnFocus
                     }
-                }
-                .focusProperties {
-                    // Crash for some reason ...
-//                    nextFocusRequester?.requestFocus()
                 },
-            onValueChange = onValueChange,
-            enabled = { wordField().enabled },
-            value = { wordField().value },
             keyboardOptions = keyboardOptions,
-            keyboardActions = KeyboardActions(
-                onDone = { doneClick() }
-            )
+            keyboardActions = keyboardActions,
+            enabled = enabled,
+            value = wordValue,
+            onValueChange = onValueChange,
         )
 
         Text(
@@ -114,7 +103,7 @@ fun WordTextField(
                     shape = RoundedCornerShape(4.dp),
                 )
                 .padding(vertical = 2.dp, horizontal = 6.dp),
-            text = "$number",
+            text = model.label,
             style = localAppTypography.current.label,
             color = theme.labelColor(),
         )
@@ -122,11 +111,11 @@ fun WordTextField(
 }
 
 @Composable
-fun ActualWordTextField(
+private fun WordTextField(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    enabled: () -> Boolean,
-    value: () -> String,
+    enabled: Boolean,
+    value: String,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
@@ -140,8 +129,8 @@ fun ActualWordTextField(
             color = MnemonicWalletRecoverTheme.colors.primaryLabel
         ),
         singleLine = true,
-        enabled = enabled(),
-        value = value(),
+        enabled = enabled,
+        value = value,
         onValueChange = onValueChange,
         colors = TextFieldDefaults.textFieldColors(
             cursorColor = MnemonicWalletRecoverTheme.colors.primaryLabel,
@@ -155,14 +144,11 @@ fun ActualWordTextField(
 @Composable
 fun WordTextFieldDefaultPreview() {
     MnemonicWalletRecoverAppTheme {
-        WordTextField(
+        WordFieldGridItem(
             modifier = Modifier,
-            doneClick = {},
             onValueChange = { },
-            wordField = { TextFieldModel( value = "Dolphin" ) },
-            focusRequester = remember { FocusRequester() },
-            nextFocusRequester = null,
-            number = 666,
+            model = TextFieldModel(label = "666"),
+            wordValue = "Cheeta",
         )
     }
 }

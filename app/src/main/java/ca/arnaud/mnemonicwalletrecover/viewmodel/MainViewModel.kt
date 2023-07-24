@@ -17,6 +17,7 @@ import ca.arnaud.mnemonicwalletrecover.screen.MainScreenActionCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,7 +40,8 @@ class MainViewModel @Inject constructor(
         )
     )
 
-    private val words = MutableList(DEFAULT_WORDS_COUNT) { "" }
+    private val _wordValues = MutableStateFlow(List(DEFAULT_WORDS_COUNT) { "" })
+    val wordValues: StateFlow<List<String>> = _wordValues
 
     private val _walletWordsModel = MutableStateFlow(generateWalletWordsModel())
     val walletWordsModel: StateFlow<WalletWordsModel> = _walletWordsModel
@@ -51,12 +53,7 @@ class MainViewModel @Inject constructor(
     val dialog: StateFlow<WalletInfoDialogModel?> = _dialog
 
     private fun generateWalletWordsModel(): WalletWordsModel {
-        return walletWordsModelFactory.create(words)
-    }
-
-    private fun updateWalletWord(text: String, index: Int) {
-        words[index] = text
-        _walletWordsModel.value = generateWalletWordsModel()
+        return walletWordsModelFactory.create(wordValues.value)
     }
 
     private fun getDefaultButton(): LoadingButtonModel {
@@ -70,7 +67,7 @@ class MainViewModel @Inject constructor(
             titleRes = R.string.generating_wallet_button,
             isLoading = true
         )
-        _walletWordsModel.value = walletWordsModelFactory.createDisabled(words)
+        _walletWordsModel.value = walletWordsModelFactory.createDisabled(wordValues.value)
     }
 
     private fun hideLoader() {
@@ -85,7 +82,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val wallet = generateCryptoWallet.execute(
                 CreateWalletParams(
-                    words = listToWalletWordsMapper.mapTo(words)
+                    words = listToWalletWordsMapper.mapTo(wordValues.value)
                 )
             )
 
@@ -103,7 +100,14 @@ class MainViewModel @Inject constructor(
     }
 
     override fun onWordFieldChanged(index: Int, text: String) {
-        updateWalletWord(text, index)
+        _wordValues.update { list ->
+            List(list.size) { i ->
+                when (i) {
+                    index -> text
+                    else -> list[i]
+                }
+            }
+        }
     }
 
     // region
