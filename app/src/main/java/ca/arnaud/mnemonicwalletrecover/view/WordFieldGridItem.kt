@@ -3,6 +3,7 @@ package ca.arnaud.mnemonicwalletrecover.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -95,19 +96,31 @@ fun WordFieldGridItem(
             onValueChange = onValueChange,
         )
 
-        Text(
-            modifier = Modifier
-                .align(BiasAlignment(-0f, -1f))
-                .background(
-                    color = theme.backgroundColor(),
-                    shape = RoundedCornerShape(4.dp),
-                )
-                .padding(vertical = 2.dp, horizontal = 6.dp),
+        LabelText(modifier = Modifier
+            .align(BiasAlignment(-0f, -1f))
+            .background(
+                color = theme.backgroundColor(),
+                shape = RoundedCornerShape(4.dp),
+            )
+            .padding(vertical = 2.dp, horizontal = 6.dp),
             text = model.label,
-            style = localAppTypography.current.label,
-            color = theme.labelColor(),
+            textColor = theme.labelColor(),
         )
     }
+}
+
+@Composable
+private fun BoxScope.LabelText(
+    modifier: Modifier,
+    text: String,
+    textColor: Color,
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = localAppTypography.current.label,
+        color = textColor,
+    )
 }
 
 @Composable
@@ -136,6 +149,8 @@ private fun WordTextField(
             cursorColor = MnemonicWalletRecoverTheme.colors.primaryLabel,
             backgroundColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
         )
     )
 }
