@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +29,8 @@ import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings.WALLET_WORDS_CO
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 import ca.arnaud.mnemonicwalletrecover.theme.localAppColors
+import ca.arnaud.mnemonicwalletrecover.view.LegacyWordFieldGrid
 import ca.arnaud.mnemonicwalletrecover.view.LoadingButton
-import ca.arnaud.mnemonicwalletrecover.view.WalletInfoDialog
 import ca.arnaud.mnemonicwalletrecover.view.WordFieldGridItem
 
 interface MainScreenActionCallback {
@@ -51,7 +53,6 @@ fun MainScreen(
     model: MainScreenModel,
     wordValues: (Int) -> String,
     button: () -> LoadingButtonModel,
-    dialog: WalletInfoDialogModel?,
     callback: MainScreenActionCallback
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -69,23 +70,34 @@ fun MainScreen(
             )
         },
         content = { paddingValues ->
-            //    val scrollState = rememberScrollState()
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .fillMaxSize(),
-//            .verticalScroll(scrollState), // Doesn't work with lazyVerticalGrid but just don't need it?
+                    .fillMaxSize()
+                    .verticalScroll(scrollState), // Doesn't work with lazyVerticalGrid but just don't need it?
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                WordFieldGrid(
-                    modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
-                    wordFields = model.wordFields,
-                    wordValues = wordValues,
-                    onValueChanged = callback::onWordFieldChanged,
-                    onDoneClick = callback::recoverWalletButtonClick,
-                    keyboardController = keyboardController,
-                )
+                if (true) {
+                    LegacyWordFieldGrid(
+                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
+                        wordFields = { model.wordFields },
+                        wordValues = wordValues,
+                        onValueChanged = callback::onWordFieldChanged,
+                        onDoneClick = callback::recoverWalletButtonClick,
+                        keyboardController = keyboardController,
+                    )
+                } else {
+                    WordFieldGrid(
+                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
+                        wordFields = model.wordFields,
+                        wordValues = wordValues,
+                        onValueChanged = callback::onWordFieldChanged,
+                        onDoneClick = callback::recoverWalletButtonClick,
+                        keyboardController = keyboardController,
+                    )
+                }
             }
         },
         bottomBar = {
@@ -166,7 +178,6 @@ fun DefaultPreview() {
             ),
             wordValues = { index -> "Word ${index + 1}" },
             button = { LoadingButtonModel("Generate Wallet", false) },
-            dialog = null,
             callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
                 override fun dismissWalletInfoDialogClick() {}
