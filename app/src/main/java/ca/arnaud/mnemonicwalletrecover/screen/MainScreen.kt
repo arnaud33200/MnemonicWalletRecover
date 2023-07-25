@@ -94,7 +94,7 @@ fun MainScreen(
                     .padding(10.dp)
                     .height(50.dp)
                     .fillMaxWidth(),
-                model = button(),
+                model = button,
                 onClick = {
                     keyboardController?.hide()
                     callback.recoverWalletButtonClick()
@@ -102,14 +102,6 @@ fun MainScreen(
             )
         }
     )
-
-    dialog?.let { dialogModel ->
-        WalletInfoDialog(
-            model = dialogModel,
-            onDismiss = callback::dismissWalletInfoDialogClick,
-            onCopyPrivateKeyClick = callback::copyPrivateKeyClick,
-        )
-    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

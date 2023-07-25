@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreen
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
+import ca.arnaud.mnemonicwalletrecover.view.WalletInfoDialog
 import ca.arnaud.mnemonicwalletrecover.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,9 +33,16 @@ class MainActivity : ComponentActivity() {
                         model = screenModel,
                         wordValues = { index -> wordValues.getOrNull(index) ?: "" },
                         button = { button },
-                        dialog = dialog,
                         callback = viewModel
                     )
+
+                    dialog?.let { dialogModel ->
+                        WalletInfoDialog(
+                            model = dialogModel,
+                            onDismiss = viewModel::dismissWalletInfoDialogClick,
+                            onCopyPrivateKeyClick = viewModel::copyPrivateKeyClick,
+                        )
+                    }
                 }
             }
         }

@@ -85,7 +85,7 @@ fun WalletInfoDialog(
                     modifier = Modifier
                         .padding(top = 35.dp)
                         .height(MnemonicWalletRecoverTheme.dimensions.buttonHeight),
-                    model = model.copyButton,
+                    model = { model.copyButton },
                     onClick = onCopyPrivateKeyClick
                 )
             }

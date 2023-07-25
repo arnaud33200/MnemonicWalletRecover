@@ -19,14 +19,14 @@ import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
 fun LoadingButton(
     modifier: Modifier,
     onClick: () -> Unit,
-    model: LoadingButtonModel
+    model: () -> LoadingButtonModel,
 ) {
     Button(
         modifier = modifier,
         onClick = onClick,
-        enabled = !model.isLoading,
+        enabled = !model().isLoading,
     ) {
-        if (model.isLoading) {
+        if (model().isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .padding(end = 10.dp)
@@ -36,10 +36,10 @@ fun LoadingButton(
         }
 
         Text(
-            text = model.title,
+            text = model().title,
             textAlign = TextAlign.Center,
             style = MnemonicWalletRecoverTheme.typography.button1,
-            color = when (model.isLoading) {
+            color = when (model().isLoading) {
                 true -> MnemonicWalletRecoverTheme.colors.labelOnPrimary
                 false -> MnemonicWalletRecoverTheme.colors.onSecondary
             }
@@ -54,10 +54,12 @@ fun PreviewLoadingButtonIsNotLoading() {
         LoadingButton(
             modifier = Modifier
                 .height(50.dp),
-            model = LoadingButtonModel(
-                "Create Wallet",
-                isLoading = false
-            ),
+            model = {
+                LoadingButtonModel(
+                    "Create Wallet",
+                    isLoading = false
+                )
+            },
             onClick = {}
         )
     }
@@ -70,10 +72,12 @@ fun PreviewLoadingButtonIsLoading() {
         LoadingButton(
             modifier = Modifier
                 .height(50.dp),
-            model = LoadingButtonModel(
-                "Loading...",
-                isLoading = true
-            ),
+            model = {
+                LoadingButtonModel(
+                    "Loading...",
+                    isLoading = true
+                )
+            },
             onClick = {}
         )
     }
