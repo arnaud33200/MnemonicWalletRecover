@@ -53,6 +53,7 @@ fun MainScreen(
     model: MainScreenModel,
     wordValues: (Int) -> String,
     button: () -> LoadingButtonModel,
+    nextFocusIndex: () -> Int?,
     callback: MainScreenActionCallback
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -84,6 +85,7 @@ fun MainScreen(
                         modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp),
                         wordFields = { model.wordFields },
                         wordValues = wordValues,
+                        nextFocusIndex = nextFocusIndex,
                         onValueChanged = callback::onWordFieldChanged,
                         onDoneClick = callback::recoverWalletButtonClick,
                         keyboardController = keyboardController,
@@ -178,6 +180,7 @@ fun DefaultPreview() {
             ),
             wordValues = { index -> "Word ${index + 1}" },
             button = { LoadingButtonModel("Generate Wallet", false) },
+            nextFocusIndex = { null },
             callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
                 override fun dismissWalletInfoDialogClick() {}

@@ -27,11 +27,13 @@ fun ColumnScope.LegacyWordFieldGrid(
     onDoneClick: () -> Unit,
     wordFields: () -> List<TextFieldModel>,
     wordValues: (Int) -> String,
+    nextFocusIndex: () -> Int?,
     keyboardController: SoftwareKeyboardController?
 ) {
     val focusRequesters = remember { List(wordFields().size) { FocusRequester() } }
     val columnCount = remember { MainScreenSettings.WALLET_WORDS_COLUMNS }
     val rowCount = remember { wordFields().size / columnCount }
+    val nextFocusRequester = nextFocusIndex()?.let { focusRequesters.getOrNull(it) }
 
     for (y in 0 until rowCount) {
         Row(
@@ -42,8 +44,6 @@ fun ColumnScope.LegacyWordFieldGrid(
                 val index = remember { (y * columnCount) + x }
 
                 val focusRequester by rememberUpdatedState(focusRequesters[index])
-                val nextFocusRequesterIndex = index + 1
-                val nextFocusRequester = focusRequesters.getOrNull(nextFocusRequesterIndex)
 
                 WordFieldGridItem(
                     modifier = Modifier

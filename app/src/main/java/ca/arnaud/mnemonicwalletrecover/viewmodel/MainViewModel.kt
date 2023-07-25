@@ -36,6 +36,9 @@ class MainViewModel @Inject constructor(
     private val _wordValues = MutableStateFlow(MnemonicList { "" })
     val wordValues: StateFlow<MnemonicList<String>> = _wordValues
 
+    private val _nextEmptyFieldIndex = MutableStateFlow<Int?>(0)
+    val nextEmptyFieldIndex: StateFlow<Int?> = _nextEmptyFieldIndex
+
     private val _button = MutableStateFlow(getDefaultButton())
     val button: StateFlow<LoadingButtonModel> = _button
 
@@ -103,6 +106,8 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
+        _nextEmptyFieldIndex.value = wordValues.value.indexOfFirst { it.isBlank() }
+            .takeIf { it >= 0 }
     }
 
     // region

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreen
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
@@ -24,15 +25,17 @@ class MainActivity : ComponentActivity() {
             MnemonicWalletRecoverAppTheme {
 
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
-                    val screenModel = viewModel.screenModel.collectAsState().value
-                    val wordValues = viewModel.wordValues.collectAsState().value
-                    val button = viewModel.button.collectAsState().value
-                    val dialog = viewModel.dialog.collectAsState().value
+                    val screenModel by viewModel.screenModel.collectAsState()
+                    val wordValues by viewModel.wordValues.collectAsState()
+                    val nextFocusIndex by viewModel.nextEmptyFieldIndex.collectAsState()
+                    val button by viewModel.button.collectAsState()
+                    val dialog by viewModel.dialog.collectAsState()
 
                     MainScreen(
                         model = screenModel,
                         wordValues = { index -> wordValues.getOrNull(index) ?: "" },
                         button = { button },
+                        nextFocusIndex = { nextFocusIndex },
                         callback = viewModel
                     )
 
