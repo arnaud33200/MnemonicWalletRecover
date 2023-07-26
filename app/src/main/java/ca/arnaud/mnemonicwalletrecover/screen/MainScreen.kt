@@ -9,8 +9,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -54,10 +57,22 @@ fun MainScreen(
     wordValues: (Int) -> String,
     button: () -> LoadingButtonModel,
     nextFocusIndex: () -> Int?,
+    snackbarMessage: String?,
     callback: MainScreenActionCallback
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+            )
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         backgroundColor = localAppColors.current.background, // TODO - not set after moving theme fully to material
         topBar = {
             Text(
@@ -181,6 +196,7 @@ fun DefaultPreview() {
             wordValues = { index -> "Word ${index + 1}" },
             button = { LoadingButtonModel("Generate Wallet", false) },
             nextFocusIndex = { null },
+            snackbarMessage = null,
             callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
                 override fun dismissWalletInfoDialogClick() {}

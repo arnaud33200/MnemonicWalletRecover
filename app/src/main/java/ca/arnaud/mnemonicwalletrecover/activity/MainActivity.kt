@@ -7,6 +7,9 @@ import androidx.activity.viewModels
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreen
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverAppTheme
 import ca.arnaud.mnemonicwalletrecover.theme.MnemonicWalletRecoverTheme
@@ -25,6 +28,16 @@ class MainActivity : ComponentActivity() {
             MnemonicWalletRecoverAppTheme {
 
                 Surface(color = MnemonicWalletRecoverTheme.colors.background) {
+                    var snackbarMessage by remember { mutableStateOf<String?>(null) }
+                    val event by viewModel.event.collectAsState()
+                    event?.let { eventState ->
+                        when (eventState) {
+                            is MainViewModel.Event.PrivateKeyCopied -> {
+                                snackbarMessage = eventState.message
+                            }
+                        }
+                    }
+
                     val screenModel by viewModel.screenModel.collectAsState()
                     val wordValues by viewModel.wordValues.collectAsState()
                     val nextFocusIndex by viewModel.nextEmptyFieldIndex.collectAsState()
@@ -36,7 +49,8 @@ class MainActivity : ComponentActivity() {
                         wordValues = { index -> wordValues.getOrNull(index) ?: "" },
                         button = { button },
                         nextFocusIndex = { nextFocusIndex },
-                        callback = viewModel
+                        callback = viewModel,
+                        snackbarMessage = snackbarMessage,
                     )
 
                     dialog?.let { dialogModel ->

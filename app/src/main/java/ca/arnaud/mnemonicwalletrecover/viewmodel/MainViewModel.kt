@@ -7,6 +7,7 @@ import ca.arnaud.domain.formatter.MnemonicWordFormatter
 import ca.arnaud.domain.model.ClipboardData
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.MnemonicList
+import ca.arnaud.domain.model.Wallet
 import ca.arnaud.domain.usecase.CreateCryptoWallet
 import ca.arnaud.domain.usecase.SetClipboard
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
@@ -48,6 +49,17 @@ class MainViewModel @Inject constructor(
     private val _dialog = MutableStateFlow<WalletInfoDialogModel?>(null)
     val dialog: StateFlow<WalletInfoDialogModel?> = _dialog
 
+    private val _event = MutableStateFlow<Event?>(null)
+    val event: StateFlow<Event?> = _event
+
+    private var wallet: Wallet? = null
+
+    sealed interface Event {
+        data class PrivateKeyCopied(
+            val message: String,
+        ) : Event
+    }
+
     private fun getDefaultButton(): LoadingButtonModel {
         return loadingButtonModelFactory.create(
             titleRes = R.string.generate_wallet_button
@@ -80,26 +92,34 @@ class MainViewModel @Inject constructor(
     override fun recoverWalletButtonClick() {
         showLoader()
         viewModelScope.launch {
-            val wallet = createCryptoWallet.execute(
+            wallet = createCryptoWallet.execute(
                 CreateWalletParams(
                     words = wordValues.value,
                     password = "" // TODO - add field
                 )
             )
-
             hideLoader()
-            _dialog.value = walletInfoDialogModelFactory.create(wallet)
+
+            wallet?.let { createdWallet ->
+                // TODO - setup a viewModel event
+                _dialog.value = walletInfoDialogModelFactory.create(createdWallet)
+            }
         }
     }
 
     override fun dismissWalletInfoDialogClick() {
+        wallet = null
         _dialog.value = null
     }
 
     override fun copyPrivateKeyClick() {
-        viewModelScope.launch {
-            val privateKey = "" // TODO - hold the wallet
-            setClipboard.execute(ClipboardData.Text(text = privateKey))
+        wallet?.privateKey?.let { privateKey ->
+            viewModelScope.launch {
+                setClipboard.execute(ClipboardData.Text(text = privateKey))
+            }
+            _event.value = Event.PrivateKeyCopied(
+                message = "Private key copied!" // TODO - add in string provider
+            )
         }
     }
 
