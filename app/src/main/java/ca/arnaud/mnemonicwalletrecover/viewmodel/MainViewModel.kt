@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.arnaud.MnemonicWalletRecover.R
 import ca.arnaud.domain.formatter.MnemonicWordFormatter
+import ca.arnaud.domain.model.ClipboardData
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.MnemonicList
 import ca.arnaud.domain.usecase.CreateCryptoWallet
+import ca.arnaud.domain.usecase.SetClipboard
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val createCryptoWallet: CreateCryptoWallet,
+    private val setClipboard: SetClipboard,
     private val mainScreenModelFactory: MainScreenModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
@@ -94,7 +97,10 @@ class MainViewModel @Inject constructor(
     }
 
     override fun copyPrivateKeyClick() {
-        // TODO - use case to copy key
+        viewModelScope.launch {
+            val privateKey = "" // TODO - hold the wallet
+            setClipboard.execute(ClipboardData.Text(text = privateKey))
+        }
     }
 
     override fun onWordFieldChanged(index: Int, text: String) {
