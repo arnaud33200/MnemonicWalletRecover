@@ -1,6 +1,6 @@
 package ca.arnaud.domain.usecase
 
-import ca.arnaud.domain.executor.JobExecutorProvider
+import ca.arnaud.domain.provider.coroutine.CoroutineContextProvider
 import ca.arnaud.domain.formatter.MnemonicWordFormatter
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.Wallet
@@ -13,10 +13,10 @@ import org.web3j.crypto.Credentials
 import org.web3j.utils.Numeric
 import javax.inject.Inject
 
-class GenerateCryptoWallet @Inject constructor(
-    jobExecutorProvider: JobExecutorProvider,
+class CreateCryptoWallet @Inject constructor(
+    coroutineContextProvider: CoroutineContextProvider,
     private val mnemonicWordFormatter: MnemonicWordFormatter,
-) : SuspendableUseCase<CreateWalletParams, Wallet>(jobExecutorProvider) {
+) : SuspendableUseCase<CreateWalletParams, Wallet>(coroutineContextProvider) {
 
     override suspend fun buildRequest(params: CreateWalletParams): Wallet {
         val words = params.words.map { mnemonicWordFormatter.format(it) }

@@ -1,8 +1,8 @@
 package ca.arnaud.mnemonicwalletrecover.di
 
 import android.content.Context
-import ca.arnaud.domain.executor.JobExecutorProvider
-import ca.arnaud.domain.executor.JobExecutorProviderImpl
+import ca.arnaud.domain.provider.coroutine.CoroutineContextProvider
+import ca.arnaud.domain.provider.coroutine.CoroutineContextProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,5 +23,5 @@ abstract class AppModule {
     }
 
     @Binds
-    abstract fun bindJobExecutorProvider(impl: JobExecutorProviderImpl): JobExecutorProvider
+    abstract fun bindJobExecutorProvider(impl: CoroutineContextProviderImpl): CoroutineContextProvider
 }

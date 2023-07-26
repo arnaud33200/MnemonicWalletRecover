@@ -6,7 +6,7 @@ import ca.arnaud.MnemonicWalletRecover.R
 import ca.arnaud.domain.formatter.MnemonicWordFormatter
 import ca.arnaud.domain.model.CreateWalletParams
 import ca.arnaud.domain.model.MnemonicList
-import ca.arnaud.domain.usecase.GenerateCryptoWallet
+import ca.arnaud.domain.usecase.CreateCryptoWallet
 import ca.arnaud.mnemonicwalletrecover.factory.LoadingButtonModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val generateCryptoWallet: GenerateCryptoWallet,
+    private val createCryptoWallet: CreateCryptoWallet,
     private val mainScreenModelFactory: MainScreenModelFactory,
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
@@ -77,7 +77,7 @@ class MainViewModel @Inject constructor(
     override fun recoverWalletButtonClick() {
         showLoader()
         viewModelScope.launch {
-            val wallet = generateCryptoWallet.execute(
+            val wallet = createCryptoWallet.execute(
                 CreateWalletParams(
                     words = wordValues.value,
                     password = "" // TODO - add field
