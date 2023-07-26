@@ -56,8 +56,7 @@ class MainActivity : ComponentActivity() {
                     dialog?.let { dialogModel ->
                         WalletInfoDialog(
                             model = dialogModel,
-                            onDismiss = viewModel::dismissWalletInfoDialogClick,
-                            onCopyPrivateKeyClick = viewModel::copyPrivateKeyClick,
+                            callback = viewModel,
                         )
                     }
                 }

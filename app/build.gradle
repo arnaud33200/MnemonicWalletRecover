@@ -66,6 +66,7 @@ dependencies {
 
     implementation composeUi
     implementation composeMaterial
+    implementation MaterialIcons
     implementation ComposeActivity
     implementation ComposePreview
 

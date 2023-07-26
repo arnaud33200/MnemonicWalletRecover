@@ -15,8 +15,10 @@ import ca.arnaud.mnemonicwalletrecover.factory.MainScreenModelFactory
 import ca.arnaud.mnemonicwalletrecover.factory.WalletInfoDialogModelFactory
 import ca.arnaud.mnemonicwalletrecover.model.LoadingButtonModel
 import ca.arnaud.mnemonicwalletrecover.model.MainScreenModel
+import ca.arnaud.mnemonicwalletrecover.model.PrivateKeyMode
 import ca.arnaud.mnemonicwalletrecover.model.WalletInfoDialogModel
 import ca.arnaud.mnemonicwalletrecover.screen.MainScreenActionCallback
+import ca.arnaud.mnemonicwalletrecover.view.WalletInfoDialogCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +34,7 @@ class MainViewModel @Inject constructor(
     private val loadingButtonModelFactory: LoadingButtonModelFactory,
     private val walletInfoDialogModelFactory: WalletInfoDialogModelFactory,
     private val mnemonicWordFormatter: MnemonicWordFormatter,
-) : ViewModel(), MainScreenActionCallback {
+) : ViewModel(), MainScreenActionCallback, WalletInfoDialogCallback {
 
     private val _screenModel = MutableStateFlow(mainScreenModelFactory.create())
     val screenModel: StateFlow<MainScreenModel> = _screenModel
@@ -107,22 +109,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    override fun dismissWalletInfoDialogClick() {
-        wallet = null
-        _dialog.value = null
-    }
-
-    override fun copyPrivateKeyClick() {
-        wallet?.privateKey?.let { privateKey ->
-            viewModelScope.launch {
-                setClipboard.execute(ClipboardData.Text(text = privateKey))
-            }
-            _event.value = Event.PrivateKeyCopied(
-                message = "Private key copied!" // TODO - add in string provider
-            )
-        }
-    }
-
     override fun onWordFieldChanged(index: Int, text: String) {
         _wordValues.update { list ->
             MnemonicList { i ->
@@ -137,4 +123,43 @@ class MainViewModel @Inject constructor(
     }
 
     // region
+
+    // region Wallet Dialog Callback
+
+    override fun onDismiss() {
+        wallet = null
+        _dialog.value = null
+    }
+
+    override fun onCopyPrivateKeyClick() {
+        wallet?.privateKey?.let { privateKey ->
+            viewModelScope.launch {
+                setClipboard.execute(ClipboardData.Text(text = privateKey))
+            }
+            _event.value = Event.PrivateKeyCopied(
+                message = "Private key copied!" // TODO - add in string provider
+            )
+        }
+    }
+
+    override fun onPrivateKeyModeClick() {
+        _dialog.update { dialog ->
+            if (dialog == null) {
+                return@update null
+            }
+            val newMode = when (dialog.privateKeyMode) {
+                PrivateKeyMode.Hidden -> PrivateKeyMode.Show
+                PrivateKeyMode.Show -> PrivateKeyMode.Hidden
+            }
+
+            dialog.copy(
+                privateKeyMode = newMode,
+                formattedPrivateKey = walletInfoDialogModelFactory.formatPrivateKey(
+                    wallet?.privateKey ?: "", newMode
+                )
+            )
+        }
+    }
+
+    // endregion
 }

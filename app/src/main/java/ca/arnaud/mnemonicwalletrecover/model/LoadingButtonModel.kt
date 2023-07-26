@@ -1,6 +1,6 @@
 package ca.arnaud.mnemonicwalletrecover.model
 
 data class LoadingButtonModel(
-    val title: String,
-    val isLoading: Boolean
+    val title: String = "",
+    val isLoading: Boolean = false,
 )

@@ -39,10 +39,6 @@ import ca.arnaud.mnemonicwalletrecover.view.WordFieldGridItem
 interface MainScreenActionCallback {
     fun recoverWalletButtonClick()
 
-    fun dismissWalletInfoDialogClick()
-
-    fun copyPrivateKeyClick()
-
     fun onWordFieldChanged(index: Int, text: String)
 }
 
@@ -199,8 +195,6 @@ fun DefaultPreview() {
             snackbarMessage = null,
             callback = object : MainScreenActionCallback {
                 override fun recoverWalletButtonClick() {}
-                override fun dismissWalletInfoDialogClick() {}
-                override fun copyPrivateKeyClick() {}
                 override fun onWordFieldChanged(index: Int, text: String) {}
             }
         )
