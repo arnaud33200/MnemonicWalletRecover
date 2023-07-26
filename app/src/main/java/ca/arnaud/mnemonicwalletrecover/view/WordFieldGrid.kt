@@ -21,8 +21,8 @@ import ca.arnaud.mnemonicwalletrecover.screen.MainScreenSettings
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ColumnScope.LegacyWordFieldGrid(
-    modifier: Modifier = Modifier,
+fun ColumnScope.WordFieldGrid(
+    rowModifier: Modifier = Modifier,
     onValueChanged: (Int, String) -> Unit,
     onDoneClick: () -> Unit,
     wordFields: () -> List<TextFieldModel>,
@@ -37,8 +37,7 @@ fun ColumnScope.LegacyWordFieldGrid(
 
     for (y in 0 until rowCount) {
         Row(
-            modifier = Modifier
-                .padding(vertical = 0.dp, horizontal = 5.dp)
+            modifier = rowModifier
         ) {
             for (x in 0 until columnCount) {
                 val index = remember { (y * columnCount) + x }
@@ -49,7 +48,7 @@ fun ColumnScope.LegacyWordFieldGrid(
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .weight(1f)
-                        .padding(vertical = 5.dp),
+                        .padding(start = if (x > 0) 3.dp else 0.dp),
                     model = wordFields()[index],
                     wordValue = wordValues(index),
                     keyboardOptions = KeyboardOptions.Default.copy(
