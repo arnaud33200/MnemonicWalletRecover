@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
 
                     val screenModel by viewModel.screenModel.collectAsState()
                     val wordValues by viewModel.wordValues.collectAsState()
+                    val passwordValue by viewModel.passwordValue.collectAsState()
                     val nextFocusIndex by viewModel.nextEmptyFieldIndex.collectAsState()
                     val button by viewModel.button.collectAsState()
                     val dialog by viewModel.dialog.collectAsState()
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
                         button = { button },
                         nextFocusIndex = { nextFocusIndex },
                         callback = viewModel,
+                        passwordValue = { passwordValue },
                         snackbarMessage = snackbarMessage,
                     )
 

@@ -42,6 +42,9 @@ class MainViewModel @Inject constructor(
     private val _wordValues = MutableStateFlow(MnemonicList { "" })
     val wordValues: StateFlow<MnemonicList<String>> = _wordValues
 
+    private val _passwordValue = MutableStateFlow("")
+    val passwordValue: StateFlow<String> = _passwordValue
+
     private val _nextEmptyFieldIndex = MutableStateFlow<Int?>(0)
     val nextEmptyFieldIndex: StateFlow<Int?> = _nextEmptyFieldIndex
 
@@ -97,7 +100,7 @@ class MainViewModel @Inject constructor(
             wallet = createCryptoWallet.execute(
                 CreateWalletParams(
                     words = wordValues.value,
-                    password = "" // TODO - add field
+                    password = passwordValue.value
                 )
             )
             hideLoader()
@@ -120,6 +123,10 @@ class MainViewModel @Inject constructor(
         }
         _nextEmptyFieldIndex.value = wordValues.value.indexOfFirst { it.isBlank() }
             .takeIf { it >= 0 }
+    }
+
+    override fun onPasswordFieldChanged(text: String) {
+        _passwordValue.value = text // TODO - format
     }
 
     // region
